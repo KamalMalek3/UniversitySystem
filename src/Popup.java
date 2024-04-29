@@ -13,7 +13,7 @@ public class Popup {
 	public void showInfo(String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Info ");
-        alert.setHeaderText("Search Result");
+        alert.setHeaderText("INFO");
         alert.setContentText(message);
         alert.showAndWait();
     }

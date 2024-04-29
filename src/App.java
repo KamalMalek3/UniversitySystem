@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 public class App extends Application {
 
     private Stages stg = new Stages();
+    private Methods methods = new Methods(); 
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -50,23 +51,31 @@ public class App extends Application {
 
         signInButton.setOnAction(e->{
             String person = combo_box.getValue();
-            String name = "test";
-            boolean isSignedIn = true;
+            String user = idField.getText();
+            String pass = passwordField.getText();
+            String name;
+
+            boolean isSignedIn=methods.canSignIn(user, pass, person);
+            
+            
             if (isSignedIn)
             {
                 switch (person) {
                     case "Admin":
-                        stg.AdminStage(name);
+                        stg.AdminStage();
                         break;
                     case "Student":
-                        stg.studentStage(name);
+                        name =(methods.getNameString(true, user));
+                        stg.studentStage(name,user);
                         break;
                     case "Teacher":
-                        stg.TeacherStage(name);
+                        name =(methods.getNameString(false, user));
+                        stg.TeacherStage(name,user);
                         break;
                     default:
                         break;
                 }
+                primaryStage.close();
             }
         });
 
