@@ -1,3 +1,4 @@
+
 public class Course {
     private int credits;
     private String Course_code,Course_name;
@@ -41,9 +42,13 @@ public class Course {
 
     private static SqlInteract sql = new SqlInteract();
     
-    public void saveCourse(){
-            String query = "Insert into course values (\""+this.Course_code+"\",\""+this.Course_name+"\","+this.credits+","+this.Teacher_id+")";
-            sql.perform(query);
-    }
+    public void saveCourse()throws Exception {
 
+            String query = "Insert into course values (\""+this.Course_code+"\",\""+this.Course_name+"\","+this.credits+","+this.Teacher_id+")";
+            if(sql.perform(query)!=1){
+            Popup popup = new Popup();
+            popup.showError("Course May already Exist");
+            throw new Exception();
+            }
+    }
 }

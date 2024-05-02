@@ -1,11 +1,11 @@
 public class Methods {
-    private Popup popup = new Popup();
+    private static Popup popup = new Popup();
     private static SqlInteract sql = new SqlInteract();
 
     public Methods() {
     }
 
-    public String getNameString (boolean isStudent,String id){
+    public static String getNameString (boolean isStudent,String id){
 
         String Name;
         String query="Select fullname from ";
@@ -25,7 +25,7 @@ public class Methods {
         return Name;
     }
     
-    public boolean canSignIn(String idSignIn, String passwordSignIn, String personSignin){
+    public static boolean canSignIn(String idSignIn, String passwordSignIn, String personSignin){
         int result = 0;
         final String adminId="admin";
         final String adminPassword="admin";
@@ -48,11 +48,8 @@ public class Methods {
                 break;
         }
         }catch(Exception e){
-            popup.showError("Error Can't Sign in");
+            popup.showError("Exception Error Can't Sign in");
             return false;
-        }
-        if (result !=1){
-            popup.showInfo("Wrong Id or Password");
         }
         return (1==result);
     }

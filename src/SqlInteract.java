@@ -1,6 +1,4 @@
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public class SqlInteract {
 		}
 	}
 
-	public int perform(String query) {
+	public int perform(String query){
 		int result=0;
 		System.out.println(query);
 		try {

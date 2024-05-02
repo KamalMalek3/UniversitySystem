@@ -4,6 +4,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -13,7 +15,6 @@ import javafx.collections.FXCollections;
 public class App extends Application {
 
     private Stages stg = new Stages();
-    private Methods methods = new Methods(); 
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -22,7 +23,7 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         ImageView imageView = new ImageView(new Image("file:Images/logo1.png"));
-
+        
 
         Label idLabel = new Label("ID\t");
         TextField idField= new TextField();
@@ -30,6 +31,8 @@ public class App extends Application {
         Label passwordLabel = new Label ("Password ");
         PasswordField passwordField = new PasswordField();
         
+        Label descriptionLabel = new Label ("");
+        descriptionLabel.setTextFill(Color.RED);
 
         VBox labelbox = new VBox(2,idLabel,passwordLabel);
         labelbox.setAlignment(Pos.CENTER);
@@ -43,6 +46,7 @@ public class App extends Application {
         ComboBox<String> combo_box = new ComboBox <String>(FXCollections.observableArrayList(personArray));
         combo_box.setValue(personArray[0]);
         combo_box.setMaxWidth(220);
+        //todo 
         
         HBox hroot = new HBox(3,labelbox,fieldbox);
         hroot.setAlignment(Pos.CENTER);
@@ -55,27 +59,31 @@ public class App extends Application {
             String pass = passwordField.getText();
             String name;
 
-            boolean isSignedIn=methods.canSignIn(user, pass, person);
+            boolean isSignedIn=Methods.canSignIn(user, pass, person);
             
             
             if (isSignedIn)
             {
+                idField.clear();
+                passwordField.clear();
+                descriptionLabel.setText("");
                 switch (person) {
                     case "Admin":
                         stg.AdminStage();
                         break;
                     case "Student":
-                        name =(methods.getNameString(true, user));
+                        name =(Methods.getNameString(true, user));
                         stg.studentStage(name,user);
                         break;
                     case "Teacher":
-                        name =(methods.getNameString(false, user));
+                        name =(Methods.getNameString(false, user));
                         stg.TeacherStage(name,user);
                         break;
                     default:
                         break;
                 }
-                primaryStage.close();
+            }else{
+                descriptionLabel.setText("Incorrect ID or Password! :(");
             }
         });
 
@@ -84,7 +92,7 @@ public class App extends Application {
         forgotPasswordText.setTextFill(Color.BLUE);
 
         forgotPasswordText.setOnMouseClicked(e->{
-            stg.forgotPassworstage();
+            stg.forgotPasswordStage();
         });
         
         forgotPasswordText.setOnMouseEntered(e->{
@@ -94,8 +102,20 @@ public class App extends Application {
         forgotPasswordText.setOnMouseExited(e->{
             forgotPasswordText.setTextFill(Color.BLUE);
         });
+
+        idField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                passwordField.requestFocus();
+            }
+        });
         
-        VBox root = new VBox(10,imageView,hroot,combo_box,signInButton,forgotPasswordText);
+        passwordField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                signInButton.fire();
+            }
+        });
+
+        VBox root = new VBox(10,imageView,hroot,combo_box,signInButton,forgotPasswordText,descriptionLabel);
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
 
@@ -103,6 +123,8 @@ public class App extends Application {
         root.setBackground(new Background(new BackgroundFill(new ImagePattern(backgroundImage), null, null)));
 
         primaryStage.setTitle("Sign in !");
+        Image icon = new Image("file:Images/logo2.png");
+        primaryStage.getIcons().add(icon);
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
     }

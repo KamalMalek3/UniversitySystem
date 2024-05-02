@@ -34,10 +34,12 @@ public class Grade {
 
         try{
         String query = "Insert into grades (student_id, course_code, grade) values ("+this.student_id+",\""+this.Course_code+"\","+this.grade+")";
-        sql.perform(query);
+        if(sql.perform(query)!=1){
+            throw new Exception();
+        }
         }catch (Exception E){
             Popup pop = new Popup();
-            pop.showError("Error While Saving Grade, Grade my not be saved!");
+            pop.showError("Error While Saving Grade, Grade my for student may alraedy exist");
         }
     }
 }

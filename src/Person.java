@@ -48,7 +48,7 @@ public abstract class Person {
             popup.showError("Error while retriving id from database");
             System.exit(-1);
         }
-        generatedID *= 1000;
+        generatedID *= 10000;
         generatedID += this.rest;
         return generatedID;
     }
