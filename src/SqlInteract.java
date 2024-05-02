@@ -25,6 +25,9 @@ public class SqlInteract {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int numColumns = rsmd.getColumnCount();
 
+			if (numColumns == 0)
+				return null;
+
 			// List to store the results
 			List<String> resultList = new ArrayList<>();
 

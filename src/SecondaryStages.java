@@ -306,94 +306,149 @@ public class SecondaryStages {
         primaryStage.show();
     }
 
+    @SuppressWarnings("unchecked")
     public void viewGrades(String studentId) {
         Stage primaryStage = new Stage();
         primaryStage.setTitle("View Grades");
         Image icon = new Image("file:Images/logo2.png");
         primaryStage.getIcons().add(icon);
+        VBox root;
 
-        TableView<GradeTable> table = new TableView<>();
-        TableColumn<GradeTable, String> courseCodeColumn = new TableColumn<>("Course Code");
-        TableColumn<GradeTable, String> courseNameColumn = new TableColumn<>("Course Name");
-        TableColumn<GradeTable, Integer> gradeColumn = new TableColumn<>("Grade");
-        courseCodeColumn.setCellValueFactory(new PropertyValueFactory<>("course_code"));
-        courseNameColumn.setCellValueFactory(new PropertyValueFactory<>("course_Name"));
-        gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
-
-        ObservableList<GradeTable> data = FXCollections.observableArrayList();
-
-        String[] courseCodes = sql.fill("Select course_code from grades where student_id=" + studentId);
-        String[] grades = sql.fill("Select grade from grades where student_id=" + studentId);
-        int[] totalGrade = new int[grades.length];
-        String[] courseNames = new String[courseCodes.length];
-        int i = 0;
-        for (String code : courseCodes) {
-            totalGrade[i] = Integer
-                    .parseInt(sql.fill("Select credits from course where course_code=\"" + code + "\"")[0])
-                    * Integer.parseInt(grades[i]);
-            courseNames[i++] = sql.fill("Select Course_name from course where course_code=\"" + code + "\"")[0];
+        String studentCheckQuery = "SELECT COUNT(*) FROM enrollments WHERE student_id = " + studentId;
+        int enrollmentCount = Integer.parseInt(sql.fill(studentCheckQuery)[0]);
+        if (enrollmentCount > 0) {
+            TableView<GradeTable> table = new TableView<>();
+            TableColumn<GradeTable, String> courseCodeColumn = new TableColumn<>("Course Code");
+            TableColumn<GradeTable, String> courseNameColumn = new TableColumn<>("Course Name");
+            TableColumn<GradeTable, Integer> gradeColumn = new TableColumn<>("Grade");
+            TableColumn<GradeTable, String> creditsColumn = new TableColumn<>("Credits");
+            TableColumn<GradeTable, Integer> totalgradeColumn = new TableColumn<>("Total Grade");
+            courseCodeColumn.setCellValueFactory(new PropertyValueFactory<>("course_code"));
+            courseNameColumn.setCellValueFactory(new PropertyValueFactory<>("course_Name"));
+            gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
+            creditsColumn.setCellValueFactory(new PropertyValueFactory<>("credits"));
+            totalgradeColumn.setCellValueFactory(new PropertyValueFactory<>("totalGrade"));
+    
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    
+            ObservableList<GradeTable> data = FXCollections.observableArrayList();
+            
+            String[] courseCodes = sql.fill("Select course_code from grades where student_id=" + studentId);
+            String[] grades = sql.fill("Select grade from grades where student_id=" + studentId);
+            int[] credits = new int[grades.length];
+            int[] totalGrade = new int[grades.length];
+            String[] courseNames = new String[courseCodes.length];
+            int i = 0;
+            for (String code : courseCodes) {
+                credits[i] = Integer.parseInt(sql.fill("Select credits from course where course_code=\"" + code + "\"")[0]);
+                totalGrade[i] = credits[i] * Integer.parseInt(grades[i]);
+                courseNames[i++] = sql.fill("Select Course_name from course where course_code=\"" + code + "\"")[0];
+            }
+    
+            String getTotalCreditsQuery = "SELECT SUM(c.credits) FROM enrollments e INNER JOIN course c ON e.course_code = c.Course_code INNER JOIN grades g ON e.Student_id = g.student_id AND e.course_code = g.course_code WHERE e.Student_id ="
+                    + studentId + " GROUP BY e.Student_id";
+    
+            int totalGrades = 0;
+            for (int grade : totalGrade) {
+                totalGrades += grade;
+            }
+            int totalCredits = Integer.parseInt(sql.fill(getTotalCreditsQuery)[0]);
+            double GPA = totalGrades / totalCredits * 1.00;
+    
+            for (i = 0; i < courseCodes.length; i++) {
+                data.add(new GradeTable(courseCodes[i], courseNames[i], Integer.parseInt(grades[i]), credits[i],
+                        totalGrade[i]));
+            }
+            table.setItems(data);
+    
+            table.getColumns().addAll(courseCodeColumn, courseNameColumn, gradeColumn, creditsColumn, totalgradeColumn);
+    
+            Label totalGradesLabel = new Label("totalGrades:\t" + totalGrades);
+            Label GPALabel = new Label("GPA:\t" + GPA + "%");
+            Label totalcreditsLabel = new Label("Total credits finishied:\t" + totalCredits);
+    
+            root = new VBox(10, table, totalGradesLabel, totalcreditsLabel, GPALabel);
+        }else{
+            root = new VBox(1,new Label("You are not enrolled in any courses yet"));
         }
 
-        String getTotalCreditsQuery = "SELECT SUM(c.credits) FROM enrollments e INNER JOIN course c ON e.course_code = c.Course_code INNER JOIN grades g ON e.Student_id = g.student_id AND e.course_code = g.course_code WHERE e.Student_id ="
-                + studentId + " GROUP BY e.Student_id";
-
-        int totalGrades = 0;
-        for (int grade : totalGrade) {
-            totalGrades += grade;
-        }
-        int totalCredits = Integer.parseInt(sql.fill(getTotalCreditsQuery)[0]);
-        double GPA = totalGrades / totalCredits * 1.00;
-
-        for (i = 0; i < courseCodes.length; i++) {
-            data.add(new GradeTable(courseCodes[i], courseNames[i], Integer.parseInt(grades[i])));
-        }
-        table.setItems(data);
-
-        table.getColumns().addAll(courseCodeColumn, courseNameColumn, gradeColumn);
-
-        Label totalGradesLabel = new Label("totalGrades:\t" + totalGrades);
-        Label GPALabel = new Label("GPA:\t" + GPA + "%");
-        Label totalcreditsLabel = new Label("Total credits finishied:\t" + totalCredits);
-
-        VBox root = new VBox(10, table, totalGradesLabel, totalcreditsLabel, GPALabel);
         root.setAlignment(Pos.CENTER);
         root.setSpacing(10);
-        primaryStage.setScene(new Scene(root, 400, 400));
+        primaryStage.setScene(new Scene(root, 500, 500));
         primaryStage.show();
     }
 
     public void addDrop(String studentId) {
         Stage primaryStage = new Stage();
-        primaryStage.setTitle("Add drop course");
+        primaryStage.setTitle("Course Manager");
         Image icon = new Image("file:Images/logo2.png");
         primaryStage.getIcons().add(icon);
 
-        String[] enrolledCourses = { "Enrolled Course 1", "Enrolled Course 2", "Enrolled Course 3" };
-
+        String[] enrolledCourses = sql.fill(
+                "SELECT c.Course_Name FROM course c INNER JOIN enrollments e ON c.Course_code = e.course_code WHERE e.Student_id = "
+                        + studentId);
+        String[] availableCourses = sql.fill(
+                "SELECT c.Course_Name FROM course c WHERE NOT EXISTS (SELECT 1 FROM enrollments e WHERE e.Student_id = "
+                        + studentId + " AND e.course_code = c.Course_code)");
         // Create ListView for Enrolled Courses
         ListView<String> enrolledListView = new ListView<>();
         enrolledListView.getItems().addAll(enrolledCourses);
 
-        // Available Courses Array
-        String[] availableCourses = { "Available Course 1", "Available Course 2", "Available Course 3" };
-
-        // Create ListView for Available Courses
         ListView<String> availableListView = new ListView<>();
         availableListView.getItems().addAll(availableCourses);
 
-        // Create Button
         Button dropButton = new Button("Drop");
         dropButton.setOnAction(e -> {
-            // Implement drop action
+            String selectedCourse = enrolledListView.getSelectionModel().getSelectedItem();
+            if (selectedCourse != null) {
+                enrolledListView.getItems().remove(selectedCourse);
+                availableListView.getItems().add(selectedCourse);
+            }
         });
 
-        // Create VBox
+        Button enrollButton = new Button("Enroll");
+        enrollButton.setOnAction(e -> {
+            String selectedCourse = availableListView.getSelectionModel().getSelectedItem();
+            if (selectedCourse != null) {
+                availableListView.getItems().remove(selectedCourse);
+                enrolledListView.getItems().add(selectedCourse);
+            }
+        });
+
+        Button saveButton = new Button("Save!");
+        saveButton.setOnAction(event -> {
+            Object[] courses = enrolledListView.getItems().toArray();
+            if (sql.perform("DELETE FROM enrollments WHERE Student_id = " + studentId) == -1) {
+                popup.showError("Error deleting existing enrollments!");
+                return;
+            }
+            for (Object courseObj : courses) {
+                String course = courseObj.toString();
+                String insertEnrollmentQuery = "INSERT INTO enrollments (Student_id, course_code) " +
+                        "SELECT " + studentId + ", c.Course_code " +
+                        "FROM course c " +
+                        "WHERE c.Course_Name = '" + course + "'";
+                if (sql.perform(insertEnrollmentQuery) != 1) {
+                    popup.showError("Error inserting enrollment for course: " + course);
+                    return;
+                }
+            }
+        });
+
+        Button cancelButton = new Button("Cancel!");
+        cancelButton.setOnAction(e -> {
+            primaryStage.close();
+        });
+
+        HBox buttonHBox = new HBox(2, saveButton, cancelButton);
+        buttonHBox.setSpacing(10);
+        buttonHBox.setAlignment(Pos.CENTER);
+
         VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(enrolledListView, dropButton, availableListView);
+        root.getChildren().addAll(enrolledListView, dropButton, availableListView, enrollButton, buttonHBox);
         root.setSpacing(10);
-        primaryStage.setScene(new Scene(root, 400, 400));
+        primaryStage.setScene(new Scene(root, 600, 600));
         primaryStage.show();
     }
-
 }
