@@ -315,8 +315,10 @@ public class SecondaryStages {
         VBox root;
 
         String studentCheckQuery = "SELECT COUNT(*) FROM enrollments WHERE student_id = " + studentId;
+        String GradeQuery = "SELECT COUNT(*) FROM Grades WHERE student_id = " + studentId;
         int enrollmentCount = Integer.parseInt(sql.fill(studentCheckQuery)[0]);
-        if (enrollmentCount > 0) {
+        int gradeCount = Integer.parseInt(sql.fill(GradeQuery)[0]);
+        if (enrollmentCount > 0 && gradeCount!=0) {
             TableView<GradeTable> table = new TableView<>();
             TableColumn<GradeTable, String> courseCodeColumn = new TableColumn<>("Course Code");
             TableColumn<GradeTable, String> courseNameColumn = new TableColumn<>("Course Name");
@@ -369,7 +371,7 @@ public class SecondaryStages {
     
             root = new VBox(10, table, totalGradesLabel, totalcreditsLabel, GPALabel);
         }else{
-            root = new VBox(1,new Label("You are not enrolled in any courses yet"));
+            root = new VBox(1,new Label("You are not enrolled in any courses yet or grades aren't available yet"));
         }
 
         root.setAlignment(Pos.CENTER);
@@ -431,11 +433,14 @@ public class SecondaryStages {
                 if (sql.perform(insertEnrollmentQuery) != 1) {
                     popup.showError("Error inserting enrollment for course: " + course);
                     return;
+                }else{
+                    popup.showInfo("Saved Successfully!");
+                    return;
                 }
             }
         });
 
-        Button cancelButton = new Button("Cancel!");
+        Button cancelButton = new Button("Exit!");
         cancelButton.setOnAction(e -> {
             primaryStage.close();
         });

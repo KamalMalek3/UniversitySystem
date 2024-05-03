@@ -71,7 +71,7 @@ public class Stages{
                     passwordField.clear();
                     tryPasswordField.clear();
                 }else{
-                    String query = "Update "+TableName+" Set "+passname+"="+tryPasswordField.getText()+" Where "+idname+"="+idField.getText();
+                    String query = "Update "+TableName+" Set "+passname+"=\""+tryPasswordField.getText()+"\" Where "+idname+"="+idField.getText();
                     if (sql.perform(query)==1){
                         descriptionLabel.setTextFill(Color.GREEN);
                         descriptionLabel.setText("Password changed Successfull!");
