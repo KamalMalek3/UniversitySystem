@@ -14,7 +14,7 @@ public abstract class Person {
     private static Popup popup = new Popup();
 
     public Person() {
-        
+
     }
 
     public String getName() {
@@ -29,7 +29,7 @@ public abstract class Person {
         return ID;
     }
 
-    protected int generateID (boolean isStudent) {
+    protected int generateID(boolean isStudent) {
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
         int generatedID = currentYear * 10;
@@ -63,19 +63,19 @@ public abstract class Person {
             query = "UPDATE ids SET TeacherId = " + idToBeUpdated + " where id=1";
         }
 
-        int result=0;
-        
-            try {
-                result = sql.perform(query);
-            } catch (Exception e) {
-                popup.showError("Error While performing query on database"+query);
-            }
-            if (result == 1) {
-                popup.showInfo("ID updated!");
-                this.ID = generateID(isStudent);
-            } else {
-                popup.showError("ID not found");
-        } 
+        int result = 0;
+
+        try {
+            result = sql.perform(query);
+        } catch (Exception e) {
+            popup.showError("Error While performing query on database" + query);
+        }
+        if (result == 1) {
+            popup.showInfo("ID updated!");
+            this.ID = generateID(isStudent);
+        } else {
+            popup.showError("ID not found");
+        }
     }
 
 }

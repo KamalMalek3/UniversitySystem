@@ -318,7 +318,7 @@ public class SecondaryStages {
         String GradeQuery = "SELECT COUNT(*) FROM Grades WHERE student_id = " + studentId;
         int enrollmentCount = Integer.parseInt(sql.fill(studentCheckQuery)[0]);
         int gradeCount = Integer.parseInt(sql.fill(GradeQuery)[0]);
-        if (enrollmentCount > 0 && gradeCount!=0) {
+        if (enrollmentCount > 0 && gradeCount != 0) {
             TableView<GradeTable> table = new TableView<>();
             TableColumn<GradeTable, String> courseCodeColumn = new TableColumn<>("Course Code");
             TableColumn<GradeTable, String> courseNameColumn = new TableColumn<>("Course Name");
@@ -330,11 +330,11 @@ public class SecondaryStages {
             gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
             creditsColumn.setCellValueFactory(new PropertyValueFactory<>("credits"));
             totalgradeColumn.setCellValueFactory(new PropertyValueFactory<>("totalGrade"));
-    
+
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    
+
             ObservableList<GradeTable> data = FXCollections.observableArrayList();
-            
+
             String[] courseCodes = sql.fill("Select course_code from grades where student_id=" + studentId);
             String[] grades = sql.fill("Select grade from grades where student_id=" + studentId);
             int[] credits = new int[grades.length];
@@ -342,36 +342,37 @@ public class SecondaryStages {
             String[] courseNames = new String[courseCodes.length];
             int i = 0;
             for (String code : courseCodes) {
-                credits[i] = Integer.parseInt(sql.fill("Select credits from course where course_code=\"" + code + "\"")[0]);
+                credits[i] = Integer
+                        .parseInt(sql.fill("Select credits from course where course_code=\"" + code + "\"")[0]);
                 totalGrade[i] = credits[i] * Integer.parseInt(grades[i]);
                 courseNames[i++] = sql.fill("Select Course_name from course where course_code=\"" + code + "\"")[0];
             }
-    
+
             String getTotalCreditsQuery = "SELECT SUM(c.credits) FROM enrollments e INNER JOIN course c ON e.course_code = c.Course_code INNER JOIN grades g ON e.Student_id = g.student_id AND e.course_code = g.course_code WHERE e.Student_id ="
                     + studentId + " GROUP BY e.Student_id";
-    
+
             int totalGrades = 0;
             for (int grade : totalGrade) {
                 totalGrades += grade;
             }
             int totalCredits = Integer.parseInt(sql.fill(getTotalCreditsQuery)[0]);
             double GPA = totalGrades / totalCredits * 1.00;
-    
+
             for (i = 0; i < courseCodes.length; i++) {
                 data.add(new GradeTable(courseCodes[i], courseNames[i], Integer.parseInt(grades[i]), credits[i],
                         totalGrade[i]));
             }
             table.setItems(data);
-    
+
             table.getColumns().addAll(courseCodeColumn, courseNameColumn, gradeColumn, creditsColumn, totalgradeColumn);
-    
+
             Label totalGradesLabel = new Label("totalGrades:\t" + totalGrades);
             Label GPALabel = new Label("GPA:\t" + GPA + "%");
             Label totalcreditsLabel = new Label("Total credits finishied:\t" + totalCredits);
-    
+
             root = new VBox(10, table, totalGradesLabel, totalcreditsLabel, GPALabel);
-        }else{
-            root = new VBox(1,new Label("You are not enrolled in any courses yet or grades aren't available yet"));
+        } else {
+            root = new VBox(1, new Label("You are not enrolled in any courses yet or grades aren't available yet"));
         }
 
         root.setAlignment(Pos.CENTER);
@@ -418,6 +419,7 @@ public class SecondaryStages {
         });
 
         Button saveButton = new Button("Save!");
+        
         saveButton.setOnAction(event -> {
             Object[] courses = enrolledListView.getItems().toArray();
             if (sql.perform("DELETE FROM enrollments WHERE Student_id = " + studentId) == -1) {
@@ -432,13 +434,11 @@ public class SecondaryStages {
                         "WHERE c.Course_Name = '" + course + "'";
                 if (sql.perform(insertEnrollmentQuery) != 1) {
                     popup.showError("Error inserting enrollment for course: " + course);
-                    return;
-                }else{
-                    popup.showInfo("Saved Successfully!");
-                    return;
                 }
             }
+            popup.showInfo("Saved Successfully!");
         });
+        
 
         Button cancelButton = new Button("Exit!");
         cancelButton.setOnAction(e -> {
