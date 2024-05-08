@@ -22,6 +22,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        
         ImageView imageView = new ImageView(new Image("file:Images/logo1.png"));
 
         Label idLabel = new Label("ID\t");

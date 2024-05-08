@@ -17,20 +17,17 @@ public class SqlInteract {
 		try {
 			// Create statement
 			Statement stmt = cc.conn.createStatement();
-
 			// Execute the query
 			ResultSet rs = stmt.executeQuery(query);
-
 			// Get the number of columns
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int numColumns = rsmd.getColumnCount();
 
 			if (numColumns == 0)
-				return null;
-
+				return null; //return null of no results where found
 			// List to store the results
 			List<String> resultList = new ArrayList<>();
-
+			
 			// Iterate through the result set
 			while (rs.next()) {
 				// Iterate through columns and add each column value to the list

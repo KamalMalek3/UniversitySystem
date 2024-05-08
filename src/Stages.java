@@ -82,9 +82,7 @@ public class Stages {
                         descriptionLabel.setText("Error! Password not updated");
                     }
                 }
-
             }
-
         });
 
         primaryStage.setScene(new Scene(root, 400, 300));
