@@ -1,2 +1,0 @@
-ctrl + D select next instance of a word 
-ctrl+ Shift + L all instances
