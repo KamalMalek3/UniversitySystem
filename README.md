@@ -1,18 +1,1 @@
-## Getting Started
-
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+The aim of this codebase is to create a robust system for efficiently managing different aspects of an educational institution, including tasks like handling student and teacher information, managing course enrollments, and recording grades. Developed entirely using JavaFX, the project features a graphical user interface (GUI) for ease of use. MySQL serves as the backend database, storing essential data, while Visual Studio Code is the chosen Integrated Development Environment (IDE) for coding.
